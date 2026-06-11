@@ -1,4 +1,4 @@
-import { validateUploadFile } from "./cloudinary-upload.js";
+import { uploadFileToCloudinary, validateUploadFile } from "./cloudinary-upload.js";
 
 const UPLOAD_ICON = `
   <svg class="apply-document-upload__icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -132,6 +132,44 @@ export function initSupportingDocumentUpload(form) {
     resetUploadFeedback(elements);
   }
 
+  let uploadRequestId = 0;
+
+  async function uploadSelectedFile(file) {
+    const requestId = ++uploadRequestId;
+    selectedFile = file;
+    documentUrlInput.value = "";
+    filenameEl.textContent = `Uploading: ${file.name}`;
+    filenameEl.hidden = false;
+    resetUploadFeedback(elements);
+    setUploading(0);
+
+    try {
+      const secureUrl = await uploadFileToCloudinary(file, {
+        onProgress: (percent) => {
+          if (requestId === uploadRequestId) {
+            setUploading(percent);
+          }
+        },
+      });
+
+      if (requestId !== uploadRequestId) {
+        return false;
+      }
+
+      setUploadSuccess(secureUrl);
+      filenameEl.textContent = `Uploaded: ${file.name}`;
+      return true;
+    } catch (error) {
+      if (requestId !== uploadRequestId) {
+        return false;
+      }
+
+      clearSelection();
+      setUploadError(error?.message || "We could not upload that file. Please try again.");
+      return false;
+    }
+  }
+
   function applySelectedFile(file) {
     const validation = validateUploadFile(file);
     if (!validation.valid) {
@@ -141,12 +179,7 @@ export function initSupportingDocumentUpload(form) {
       return false;
     }
 
-    selectedFile = file;
-    documentUrlInput.value = "";
-    filenameEl.textContent = `Selected: ${file.name}`;
-    filenameEl.hidden = false;
-    resetUploadFeedback(elements);
-    setDropzoneState(dropzone, "is-selected");
+    void uploadSelectedFile(file);
     return true;
   }
 

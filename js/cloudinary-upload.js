@@ -191,33 +191,41 @@ export async function uploadApplicationFiles(form, context, { documentUpload, on
     });
   }
 
-  for (let index = 0; index < queue.length; index += 1) {
-    const item = queue[index];
-    const stepLabel =
-      queue.length > 1
-        ? `Uploading ${item.label} (${index + 1} of ${queue.length})...`
-        : `Uploading ${item.label}...`;
+  if (queue.length === 0) {
+    return context;
+  }
 
-    onStatus?.(stepLabel);
+  onStatus?.(
+    queue.length > 1
+      ? `Uploading documents (${queue.length} files)...`
+      : `Uploading ${queue[0].label}...`,
+  );
 
-    const validation = validateUploadFile(item.file);
-    if (!validation.valid) {
-      throw new Error(validation.message);
-    }
+  const results = await Promise.all(
+    queue.map(async (item) => {
+      const validation = validateUploadFile(item.file);
+      if (!validation.valid) {
+        throw new Error(validation.message);
+      }
 
-    const secureUrl = await uploadFileToCloudinary(item.file, {
-      onProgress: (percent) => {
-        item.documentUpload?.setUploading(percent);
-      },
-    });
+      const secureUrl = await uploadFileToCloudinary(item.file, {
+        onProgress: (percent) => {
+          item.documentUpload?.setUploading(percent);
+        },
+      });
 
+      return { item, secureUrl };
+    }),
+  );
+
+  results.forEach(({ item, secureUrl }) => {
     if (form[item.fieldName]) {
       form[item.fieldName].value = secureUrl;
     }
 
     context[item.contextKey] = secureUrl;
     item.documentUpload?.setUploadSuccess(secureUrl);
-  }
+  });
 
   return context;
 }

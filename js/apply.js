@@ -21,7 +21,7 @@ import {
   syncContextFileUrls,
 } from "./application-email.js";
 import "./back-button.js";
-import { uploadApplicationFiles } from "./cloudinary-upload.js";
+import { uploadApplicationFiles, uploadFileToCloudinary } from "./cloudinary-upload.js";
 import {
   initSupportingDocumentUpload,
   renderSupportingDocumentsSection,
@@ -130,11 +130,9 @@ function renderSuccess(
   posting,
   { confirmationEmailSent = false, applicationId = "", emailErrorMessage = "" } = {},
 ) {
-  const emailNote = confirmationEmailSent
-    ? `<p class="apply-panel__text">A confirmation email has been sent to the address you provided with details about the next steps. If you do not see it within a few minutes, check your spam or junk folder.</p>`
-    : emailErrorMessage
-      ? `<p class="apply-panel__text apply-panel__text--warning">Your application was received, but we could not send a confirmation email: ${escapeHtml(emailErrorMessage)}</p>`
-      : `<p class="apply-panel__text apply-panel__text--warning">Your application was received, but automatic confirmation email is not configured yet.</p>`;
+  const emailNote = emailErrorMessage
+    ? `<p class="apply-panel__text apply-panel__text--warning">Your application was received, but we could not send a confirmation email: ${escapeHtml(emailErrorMessage)}</p>`
+    : `<p class="apply-panel__text">A confirmation email will be sent to the address you provided with details about the next steps. If you do not see it within a few minutes, check your spam or junk folder.</p>`;
   const referenceNote = applicationId
     ? `<p class="apply-panel__text">Your application reference is <strong>${escapeHtml(applicationId)}</strong>.</p>`
     : "";
@@ -167,19 +165,48 @@ function initFileUpload(form, config) {
     ? form.querySelector(config.urlInputSelector)
     : null;
 
-  input.addEventListener("change", () => {
+  let uploadRequestId = 0;
+
+  input.addEventListener("change", async () => {
     const file = input.files?.[0];
+    const requestId = ++uploadRequestId;
 
     if (urlInput) {
       urlInput.value = "";
     }
 
-    if (file) {
-      updateUploadTriggerLabel(trigger, file.name, true);
+    if (!file) {
+      updateUploadTriggerLabel(trigger, config.defaultLabel, false);
       return;
     }
 
-    updateUploadTriggerLabel(trigger, config.defaultLabel, false);
+    updateUploadTriggerLabel(trigger, `Uploading ${file.name}...`, true);
+
+    try {
+      const secureUrl = await uploadFileToCloudinary(file);
+      if (requestId !== uploadRequestId) {
+        return;
+      }
+
+      if (urlInput) {
+        urlInput.value = secureUrl;
+      }
+
+      updateUploadTriggerLabel(trigger, file.name, true);
+    } catch (error) {
+      if (requestId !== uploadRequestId) {
+        return;
+      }
+
+      input.value = "";
+      updateUploadTriggerLabel(trigger, config.defaultLabel, false);
+      const errorEl = form.querySelector("#apply-form-error");
+      if (errorEl) {
+        errorEl.textContent =
+          error?.message || "We could not upload that file. Please try again.";
+        errorEl.hidden = false;
+      }
+    }
   });
 }
 
@@ -490,10 +517,10 @@ function renderForm(posting) {
             <h2 class="apply-form__section-title"><span class="apply-form__section-number">2.</span> Profile</h2>
 
             <div class="apply-form__field">
-              <label class="apply-form__label" for="apply-cv">Résumé / CV</label>
-              <p class="apply-form__field-note" id="apply-cv-hint">Upload your résumé in any format. Files upload securely when you submit.</p>
+              <label class="apply-form__label" for="apply-cv">Résumé / CV <span class="apply-form__optional">(optional)</span></label>
+              <p class="apply-form__field-note" id="apply-cv-hint">Optional — upload a résumé in any format, or use Apply with LinkedIn above. Files upload securely when selected.</p>
               <input type="hidden" id="apply-cv-url" name="cv_url" value="">
-              <input class="apply-form__upload-input" id="apply-cv" name="cv" type="file" required>
+              <input class="apply-form__upload-input" id="apply-cv" name="cv" type="file">
               <button class="apply-form__upload-trigger" id="apply-cv-trigger" type="button">Attach Résumé / CV</button>
             </div>
 
@@ -673,35 +700,24 @@ function renderForm(posting) {
       submitButton.textContent = "Submitting application...";
 
       await submitApplication(form, posting, context);
-
       syncContextFileUrls(context, form);
-
-      let confirmationEmailSent = false;
-      let emailErrorMessage = "";
-
-      try {
-        confirmationEmailSent = await sendApplicationConfirmationEmail(context);
-      } catch (emailError) {
-        emailErrorMessage =
-          emailError?.message || "The confirmation email could not be delivered.";
-        console.warn("Application confirmation email could not be sent:", emailError);
-      }
-
-      // Partner Apps Script: queue delayed payment email only after EmailJS succeeds.
-      if (confirmationEmailSent) {
-        try {
-          await scheduleFollowUpEmail(context);
-        } catch (followUpError) {
-          console.warn("Follow-up email could not be scheduled:", followUpError);
-        }
-      }
-
       await recordApprovedApplication(posting.id);
+
       renderSuccess(posting, {
-        confirmationEmailSent,
+        confirmationEmailSent: true,
         applicationId: context.applicationId,
-        emailErrorMessage,
+        emailErrorMessage: "",
       });
+
+      // Emails run after success so applicants are not left waiting on third-party services.
+      void sendApplicationConfirmationEmail(context)
+        .then((sent) => {
+          if (!sent) return;
+          return scheduleFollowUpEmail(context);
+        })
+        .catch((error) => {
+          console.warn("Post-submit email workflow could not complete:", error);
+        });
     } catch (error) {
       const message =
         error.message || "We could not submit your application. Please try again.";
