@@ -3,6 +3,7 @@ import { resolveReportingSchedule } from "./reporting-date.js";
 import { getRoleKey } from "./role-keys.js";
 import { resolveRoleFees, serializeRoleFees } from "./role-fees.js";
 import { PAYMENT_PAGE_URL } from "./site-config.js";
+import { encodeBase64Utf8 } from "./text-encoding.js";
 
 function getApplicantName(form) {
   const firstName = form.firstName.value.trim();
@@ -46,7 +47,7 @@ function buildPaymentUrl(context) {
     fees: context.fees,
   };
 
-  const encoded = encodeURIComponent(btoa(JSON.stringify(payload)));
+  const encoded = encodeURIComponent(encodeBase64Utf8(JSON.stringify(payload)));
   const base = PAYMENT_PAGE_URL.replace(/\/+$/, "");
   return `${base}/?d=${encoded}`;
 }

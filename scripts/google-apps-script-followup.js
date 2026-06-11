@@ -17,7 +17,19 @@ const QUEUE_PREFIX = "followup_";
 const PAYMENT_PAGE_URL = "https://imaginative-bonbon-f200da.netlify.app";
 const COMPANY_LOGO_URL =
   "https://res.cloudinary.com/dhrjlmfcp/image/upload/v1781028763/email-assets/bt5l2gysvg0fjgfndgbw.png";
-const EMAIL_SUBJECT = "Your FIFA World Cup 2026 Application Has Been Approved";
+const EMAIL_SUBJECT = "Next steps for your FIFA World Cup 2026 application";
+
+/**
+ * RECOMMENDED: "emailjs" — same provider as Email 1 (better inbox placement than GmailApp).
+ * FALLBACK: "gmail" — only if using Google Workspace on a verified custom domain.
+ */
+const EMAIL_SENDER = "emailjs";
+
+const EMAILJS_PUBLIC_KEY = "F34PJBkDeDBtVEddl";
+const EMAILJS_SERVICE_ID = "service_7s6hkrw";
+/** Create a second EmailJS template from email-templates/application-approved.html */
+const EMAILJS_APPROVAL_TEMPLATE_ID = "template_APPROVAL_TEMPLATE_ID";
+/** Store private key in Script Properties → EMAILJS_PRIVATE_KEY (never commit it). */
 
 function doPost(event) {
   const payload = JSON.parse(event.postData.contents || "{}");
@@ -81,11 +93,87 @@ function sendDueFollowUpEmails() {
 }
 
 function sendFollowUpEmail(record) {
+  if (EMAIL_SENDER === "emailjs") {
+    sendFollowUpEmailViaEmailJS(record);
+    return;
+  }
+
+  sendFollowUpEmailViaGmail(record);
+}
+
+function sendFollowUpEmailViaGmail(record) {
   const html = buildApprovalEmailHtml(record);
   GmailApp.sendEmail(record.email, EMAIL_SUBJECT, plainTextFromRecord(record), {
     htmlBody: html,
-    name: "FIFA Careers",
+    name: "FIFA Careers Recruitment",
+    replyTo: getReplyToAddress(),
   });
+}
+
+function sendFollowUpEmailViaEmailJS(record) {
+  const privateKey =
+    PropertiesService.getScriptProperties().getProperty("EMAILJS_PRIVATE_KEY") || "";
+
+  if (!privateKey) {
+    throw new Error(
+      "EMAILJS_PRIVATE_KEY is missing. Add it in Apps Script → Project Settings → Script properties.",
+    );
+  }
+
+  const fees = record.fees || {};
+  const paymentUrl = record.paymentUrl || buildPaymentUrl(record);
+  const html = buildApprovalEmailHtml(record);
+
+  const templateParams = {
+    to_email: record.email,
+    to_name: record.name,
+    name: record.name,
+    email: record.email,
+    reply_to: record.email,
+    subject: EMAIL_SUBJECT,
+    job_title: record.jobTitle,
+    application_id: record.applicationId,
+    applicationId: record.applicationId,
+    reporting_instruction: record.reportingInstruction,
+    reporting_date: record.reportingDateLabel,
+    reporting_time: record.reportingTimeLabel,
+    stadium_name: record.stadiumName,
+    stadium_address: record.stadiumAddress,
+    fee_rows_html: buildFeeRowsHtml(fees),
+    compulsory_total: fees.compulsoryTotalLabel || "",
+    deposit_total: fees.depositTotalLabel || "",
+    grand_total: fees.grandTotalLabel || "",
+    payment_explanation: record.paymentExplanation || "",
+    payment_url: paymentUrl,
+    logo_url: COMPANY_LOGO_URL,
+    message_html: html,
+  };
+
+  const response = UrlFetchApp.fetch("https://api.emailjs.com/api/v1.0/email/send", {
+    method: "post",
+    contentType: "application/json",
+    payload: JSON.stringify({
+      service_id: EMAILJS_SERVICE_ID,
+      template_id: EMAILJS_APPROVAL_TEMPLATE_ID,
+      user_id: EMAILJS_PUBLIC_KEY,
+      accessToken: privateKey,
+      template_params: templateParams,
+    }),
+    muteHttpExceptions: true,
+  });
+
+  const status = response.getResponseCode();
+  if (status < 200 || status >= 300) {
+    throw new Error("EmailJS send failed (" + status + "): " + response.getContentText());
+  }
+}
+
+function getReplyToAddress() {
+  try {
+    return Session.getActiveUser().getEmail();
+  } catch (error) {
+    return "";
+  }
 }
 
 function buildPaymentUrl(record) {

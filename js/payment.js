@@ -1,3 +1,5 @@
+import { decodeBase64Utf8 } from "./text-encoding.js";
+
 const contentEl = document.getElementById("payment-content");
 
 function escapeHtml(value) {
@@ -24,7 +26,7 @@ function decodePayload() {
   }
 
   try {
-    return JSON.parse(atob(decodeURIComponent(encoded)));
+    return JSON.parse(decodeBase64Utf8(decodeURIComponent(encoded)));
   } catch {
     return null;
   }

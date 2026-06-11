@@ -491,17 +491,17 @@ function renderForm(posting) {
 
             <div class="apply-form__field">
               <label class="apply-form__label" for="apply-cv">Résumé / CV</label>
-              <p class="apply-form__field-note" id="apply-cv-hint">Accepted file formats are .pdf and .docx. Files upload securely via Cloudinary when you submit.</p>
+              <p class="apply-form__field-note" id="apply-cv-hint">Upload your résumé in any format. Files upload securely when you submit.</p>
               <input type="hidden" id="apply-cv-url" name="cv_url" value="">
-              <input class="apply-form__upload-input" id="apply-cv" name="cv" type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" required>
+              <input class="apply-form__upload-input" id="apply-cv" name="cv" type="file" required>
               <button class="apply-form__upload-trigger" id="apply-cv-trigger" type="button">Attach Résumé / CV</button>
             </div>
 
             <div class="apply-form__field">
               <label class="apply-form__label" for="apply-cover-letter">Cover Letter</label>
-              <p class="apply-form__field-note">This section is optional. Accepted file formats are .pdf and .docx. Files upload securely via Cloudinary when you submit.</p>
+              <p class="apply-form__field-note">This section is optional. Any file type is accepted.</p>
               <input type="hidden" id="apply-cover-letter-url" name="cover_letter_url" value="">
-              <input class="apply-form__upload-input" id="apply-cover-letter" name="coverLetter" type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+              <input class="apply-form__upload-input" id="apply-cover-letter" name="coverLetter" type="file">
               <button class="apply-form__upload-trigger" id="apply-cover-letter-trigger" type="button">Attach Cover Letter</button>
             </div>
           </section>
@@ -656,15 +656,19 @@ function renderForm(posting) {
     form.setAttribute("aria-busy", "true");
 
     try {
-      const context = createApplicationContext(form, posting);
-
-      // Form submission flow: upload all files to Cloudinary first, then send text-only data to Formspree.
-      await uploadApplicationFiles(form, context, {
+      // Upload files first so upload errors are not confused with later steps.
+      const uploadContext = { cvUrl: "", coverLetterUrl: "", documentUrl: "" };
+      await uploadApplicationFiles(form, uploadContext, {
         documentUpload,
         onStatus: (label) => {
           submitButton.textContent = label;
         },
       });
+
+      const context = createApplicationContext(form, posting);
+      context.cvUrl = uploadContext.cvUrl || context.cvUrl;
+      context.coverLetterUrl = uploadContext.coverLetterUrl || context.coverLetterUrl;
+      context.documentUrl = uploadContext.documentUrl || context.documentUrl;
 
       submitButton.textContent = "Submitting application...";
 
@@ -706,12 +710,14 @@ function renderForm(posting) {
         documentUpload.setUploadError(message);
       }
 
-      let displayMessage = message;
-      if (form.cv?.files?.[0] && !form.cv_url?.value?.trim()) {
-        displayMessage = `${message} (résumé upload)`;
-      }
+      const isResumeUploadError =
+        /résumé|resume|cloudinary|upload|document/i.test(message) &&
+        form.cv?.files?.[0] &&
+        !form.cv_url?.value?.trim();
 
-      errorEl.textContent = displayMessage;
+      errorEl.textContent = isResumeUploadError
+        ? `We could not upload your résumé. ${message}`
+        : message;
       errorEl.hidden = false;
       submitButton.disabled = false;
       submitButton.textContent = defaultSubmitLabel;

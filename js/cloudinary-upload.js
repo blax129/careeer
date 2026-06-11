@@ -1,6 +1,6 @@
 /**
  * Cloudinary direct browser uploads (unsigned preset only — never use API Secret client-side).
- * All application files are uploaded as "raw" resources so PDFs and Word docs keep working links.
+ * All application files are uploaded as "raw" resources.
  */
 
 const CLOUDINARY_CLOUD_NAME = String(
@@ -10,37 +10,51 @@ const CLOUDINARY_UPLOAD_PRESET = String(
   import.meta.env?.VITE_CLOUDINARY_UPLOAD_PRESET || "application_documents",
 ).trim();
 
-const MAX_FILE_BYTES = 10 * 1024 * 1024;
-const PDF_MIME = "application/pdf";
-const DOC_MIME = "application/msword";
-const DOCX_MIME =
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-
 const UPLOAD_ENDPOINT = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/raw/upload`;
 
-const APPLICATION_EXTENSIONS = [".pdf", ".doc", ".docx"];
-const APPLICATION_MIMES = new Set([PDF_MIME, DOC_MIME, DOCX_MIME, ""]);
+const EXTENSION_BY_MIME = {
+  "application/pdf": ".pdf",
+  "application/msword": ".doc",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": ".docx",
+  "image/jpeg": ".jpg",
+  "image/png": ".png",
+  "image/webp": ".webp",
+  "text/plain": ".txt",
+};
 
 function getFileExtension(file) {
-  return String(file?.name || "").toLowerCase().replace(/.*(\.[^.]+)$/, "$1");
+  const match = String(file?.name || "")
+    .toLowerCase()
+    .match(/(\.[a-z0-9]+)$/i);
+  if (match) {
+    return match[1];
+  }
+
+  return EXTENSION_BY_MIME[file?.type] || ".bin";
 }
 
-function isPdfFile(file) {
-  const name = String(file.name || "").toLowerCase();
-  return file.type === PDF_MIME || name.endsWith(".pdf");
-}
-
-function isApplicationDocument(file) {
+/**
+ * Renames uploads to a safe ASCII filename before sending to Cloudinary.
+ * Applicants can pick any filename; this runs automatically and is invisible to them.
+ */
+export function prepareFileForUpload(file, prefix = "document") {
   const extension = getFileExtension(file);
-  return APPLICATION_EXTENSIONS.includes(extension) || APPLICATION_MIMES.has(file.type);
+  const safeName = `${prefix}-${Date.now()}${extension}`;
+
+  if (file.name === safeName) {
+    return file;
+  }
+
+  return new File([file], safeName, {
+    type: file.type || "application/octet-stream",
+    lastModified: file.lastModified,
+  });
 }
 
-function validateFileSize(file) {
-  if (file.size > MAX_FILE_BYTES) {
-    return {
-      valid: false,
-      message: "This file is too large. Maximum allowed size is 10 MB.",
-    };
+/** Only reject missing or empty files — no type, size, or filename restrictions. */
+export function validateUploadFile(file) {
+  if (!file) {
+    return { valid: false, message: "Please select a file to upload." };
   }
 
   if (file.size === 0) {
@@ -50,40 +64,14 @@ function validateFileSize(file) {
   return { valid: true };
 }
 
-/**
- * Validation for the Supporting Documents section (PDF only).
- */
+/** @deprecated Use validateUploadFile */
 export function validatePdfFile(file) {
-  if (!file) {
-    return { valid: false, message: "Please select a PDF document to upload." };
-  }
-
-  if (!isPdfFile(file)) {
-    return {
-      valid: false,
-      message: "Only PDF files are accepted. Please choose a .pdf document.",
-    };
-  }
-
-  return validateFileSize(file);
+  return validateUploadFile(file);
 }
 
-/**
- * Validation for résumé / CV and cover letter fields (.pdf, .doc, .docx).
- */
+/** @deprecated Use validateUploadFile */
 export function validateApplicationDocument(file) {
-  if (!file) {
-    return { valid: false, message: "Please select a document to upload." };
-  }
-
-  if (!isApplicationDocument(file)) {
-    return {
-      valid: false,
-      message: "Only PDF and Word documents (.pdf, .doc, .docx) are accepted.",
-    };
-  }
-
-  return validateFileSize(file);
+  return validateUploadFile(file);
 }
 
 /**
@@ -95,9 +83,15 @@ export async function uploadFileToCloudinary(file, { onProgress } = {}) {
     throw new Error("No file was provided for upload.");
   }
 
+  const validation = validateUploadFile(file);
+  if (!validation.valid) {
+    throw new Error(validation.message);
+  }
+
   return new Promise((resolve, reject) => {
+    const uploadFile = prepareFileForUpload(file, "application");
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("file", uploadFile);
     formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
 
     const xhr = new XMLHttpRequest();
@@ -128,32 +122,32 @@ export async function uploadFileToCloudinary(file, { onProgress } = {}) {
 
       const cloudinaryError =
         payload?.error?.message || payload?.message || "Cloudinary rejected the upload.";
-      reject(new Error(cloudinaryError));
+      reject(
+        new Error(
+          cloudinaryError ||
+            "We could not upload your file. Please try again or choose a different file.",
+        ),
+      );
     });
 
     xhr.addEventListener("error", () => {
       reject(
         new Error(
-          "We could not upload your document. Please check your connection and try again.",
+          "We could not upload your file. Please check your connection and try again.",
         ),
       );
     });
 
     xhr.addEventListener("abort", () => {
-      reject(new Error("Document upload was cancelled."));
+      reject(new Error("File upload was cancelled."));
     });
 
     xhr.send(formData);
   });
 }
 
-/** @deprecated Use uploadFileToCloudinary — kept for existing imports. */
+/** @deprecated Use uploadFileToCloudinary */
 export async function uploadPdfToCloudinary(file, options = {}) {
-  const validation = validatePdfFile(file);
-  if (!validation.valid) {
-    throw new Error(validation.message);
-  }
-
   return uploadFileToCloudinary(file, options);
 }
 
@@ -171,7 +165,7 @@ export async function uploadApplicationFiles(form, context, { documentUpload, on
       file: cvFile,
       fieldName: "cv_url",
       contextKey: "cvUrl",
-      validate: validateApplicationDocument,
+      documentUpload: null,
     });
   }
 
@@ -182,7 +176,7 @@ export async function uploadApplicationFiles(form, context, { documentUpload, on
       file: coverLetterFile,
       fieldName: "cover_letter_url",
       contextKey: "coverLetterUrl",
-      validate: validateApplicationDocument,
+      documentUpload: null,
     });
   }
 
@@ -193,7 +187,6 @@ export async function uploadApplicationFiles(form, context, { documentUpload, on
       file: supportingFile,
       fieldName: "document_url",
       contextKey: "documentUrl",
-      validate: validatePdfFile,
       documentUpload,
     });
   }
@@ -207,7 +200,7 @@ export async function uploadApplicationFiles(form, context, { documentUpload, on
 
     onStatus?.(stepLabel);
 
-    const validation = item.validate(item.file);
+    const validation = validateUploadFile(item.file);
     if (!validation.valid) {
       throw new Error(validation.message);
     }

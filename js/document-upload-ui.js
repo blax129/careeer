@@ -1,4 +1,4 @@
-import { validatePdfFile } from "./cloudinary-upload.js";
+import { validateUploadFile } from "./cloudinary-upload.js";
 
 const UPLOAD_ICON = `
   <svg class="apply-document-upload__icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -13,17 +13,16 @@ export function renderSupportingDocumentsSection() {
   return `
     <section class="apply-form__section">
       <h2 class="apply-form__section-title"><span class="apply-form__section-number">3.</span> Supporting Documents</h2>
-      <p class="apply-form__section-intro">Upload a supporting PDF document. This is optional and will be stored securely.</p>
+      <p class="apply-form__section-intro">Upload a supporting document. This is optional and will be stored securely.</p>
 
       <div class="apply-form__field">
-        <label class="apply-form__label" for="apply-document-input">Supporting document <span class="apply-form__optional">(optional, PDF only, max 10 MB)</span></label>
+        <label class="apply-form__label" for="apply-document-input">Supporting document <span class="apply-form__optional">(optional)</span></label>
 
         <input
           class="apply-form__upload-input"
           id="apply-document-input"
           name="supportingDocument"
           type="file"
-          accept="application/pdf,.pdf"
         >
         <input type="hidden" id="apply-document-url" name="document_url" value="">
 
@@ -32,12 +31,12 @@ export function renderSupportingDocumentsSection() {
           id="apply-document-dropzone"
           role="button"
           tabindex="0"
-          aria-label="Upload supporting PDF document"
+          aria-label="Upload supporting document"
         >
           ${UPLOAD_ICON}
-          <p class="apply-document-upload__title">Drag and drop your PDF here</p>
+          <p class="apply-document-upload__title">Drag and drop your file here</p>
           <p class="apply-document-upload__hint">or <span class="apply-document-upload__link">click to browse</span></p>
-          <p class="apply-document-upload__meta">PDF only · Maximum 10 MB</p>
+          <p class="apply-document-upload__meta">Any file type accepted</p>
         </div>
 
         <p class="apply-document-upload__filename" id="apply-document-filename" hidden></p>
@@ -134,7 +133,7 @@ export function initSupportingDocumentUpload(form) {
   }
 
   function applySelectedFile(file) {
-    const validation = validatePdfFile(file);
+    const validation = validateUploadFile(file);
     if (!validation.valid) {
       clearSelection();
       showValidationError(elements, validation.message);
