@@ -1,0 +1,43 @@
+<!--
+  EmailJS HTML template — paste into EmailJS dashboard (Email Templates → Content).
+
+  Settings:
+  - To Email: {{to_email}}
+  - Subject: Application Received
+
+  Variables sent by js/application-email.js:
+  {{logo_url}} {{name}} {{company_name}} {{to_email}}
+  {{application_id}} {{job_title}} {{document_url}} {{cv_url}} {{cover_letter_url}}
+-->
+<div style="background:#f4f4f4; padding:30px 0; font-family:Arial, sans-serif;">
+  <div style="text-align:center; margin-bottom:25px;">
+    <img
+      src="{{logo_url}}"
+      width="120"
+      alt="{{company_name}}"
+      style="display:block;max-width:120px;width:120px;height:auto;margin:0 auto 28px;border:0;"
+    >
+  </div>
+
+  <div style="background:#ffffff; max-width:600px; margin:auto; padding:50px 45px;">
+    <h1 style="text-align:center; font-size:42px; color:#222; margin-bottom:40px;">
+      Application<br>Received
+    </h1>
+
+    <p style="font-size:18px;">Hi {{name}},</p>
+
+    <p style="font-size:18px; line-height:1.7;">
+      Thank you very much for your application. We appreciate your trust and your interest in {{company_name}}.
+      We will now carefully review your application before proceeding with the next steps.
+    </p>
+
+    <p style="font-size:18px; line-height:1.7;">
+      As we receive many applications, this may take some time. We will contact you in due course to let you know what the next steps are.
+    </p>
+
+    <p style="font-size:18px; line-height:1.7;">
+      Many thanks,<br>
+      {{company_name}}
+    </p>
+  </div>
+</div>

@@ -1,0 +1,13 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Ensure job data is served with correct type (apply form depends on this file).
+[[headers]]
+  for = "/postings.json"
+  [headers.values]
+    Content-Type = "application/json; charset=utf-8"
+    Access-Control-Allow-Origin = "*"
