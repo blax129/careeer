@@ -2876,6 +2876,30 @@ select {
   color: var(--light-text-color);
 }
 
+.payment-card-brands {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: nowrap;
+}
+
+.payment-card-brand {
+  display: block;
+  height: 12px;
+  width: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.payment-card-brand--mastercard {
+  height: 14px;
+}
+
+.payment-card-brand--verve {
+  height: 13px;
+}
+
 .payment-panel__intro {
   margin: 0 0 28px;
   color: var(--dark-text-color);

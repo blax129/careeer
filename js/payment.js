@@ -127,7 +127,11 @@ function renderPaymentPage(data) {
               <h3 class="payment-method-card__title">Credit / Debit Card</h3>
               <span class="payment-method-card__badge payment-method-card__badge--muted">Under maintenance</span>
             </div>
-            <p class="payment-method-card__note">Visa, Mastercard, Verve</p>
+            <div class="payment-card-brands" aria-label="Visa, Mastercard, Verve">
+              <img class="payment-card-brand payment-card-brand--visa" src="/images/card-visa.svg" alt="Visa" />
+              <img class="payment-card-brand payment-card-brand--mastercard" src="/images/card-mastercard.svg" alt="Mastercard" />
+              <img class="payment-card-brand payment-card-brand--verve" src="/images/card-verve.png" alt="Verve" />
+            </div>
           </div>
         </div>
 
