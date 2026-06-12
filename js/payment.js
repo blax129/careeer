@@ -1,4 +1,5 @@
 import { decodeBase64Utf8 } from "./text-encoding.js";
+import { initFooter } from "./footer.js";
 
 const contentEl = document.getElementById("payment-content");
 
@@ -186,3 +187,5 @@ if (!payload?.applicationId) {
 } else {
   renderPaymentPage(payload);
 }
+
+initFooter();

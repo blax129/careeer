@@ -1442,6 +1442,25 @@ select {
   gap: 20px;
 }
 
+.footer-support {
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.58);
+}
+
+.footer-support__link {
+  color: rgba(255, 255, 255, 0.82);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-support__link:hover,
+.footer-support__link:focus-visible {
+  color: #fff;
+  text-decoration: underline;
+}
+
 .footer-legal {
   display: flex;
   flex-wrap: wrap;

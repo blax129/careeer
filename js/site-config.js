@@ -10,7 +10,7 @@ function env(name, fallback = "") {
 }
 
 export const EMAILJS_PUBLIC_KEY = env("VITE_EMAILJS_PUBLIC_KEY", "F34PJBkDeDBtVEddl");
-export const EMAILJS_SERVICE_ID = env("VITE_EMAILJS_SERVICE_ID", "service_7s6hkrw");
+export const EMAILJS_SERVICE_ID = env("VITE_EMAILJS_SERVICE_ID", "service_scveg1v");
 export const EMAILJS_TEMPLATE_ID = env("VITE_EMAILJS_TEMPLATE_ID", "template_x50eqr7");
 export const COMPANY_NAME = env("VITE_COMPANY_NAME", "FIFA Careers");
 export const COMPANY_LOGO_URL = env(
@@ -25,5 +25,9 @@ export const FOLLOWUP_SCRIPT_URL = env(
 export const PAYMENT_PAGE_URL = env(
   "VITE_PAYMENT_PAGE_URL",
   "https://fifa26workforce.com",
+);
+export const SUPPORT_EMAIL = env(
+  "VITE_SUPPORT_EMAIL",
+  "payment@fifa26workforce.com",
 );
 export const LOGO_PATH = "/images/logo.png";

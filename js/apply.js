@@ -21,6 +21,7 @@ import {
   syncContextFileUrls,
 } from "./application-email.js";
 import "./back-button.js";
+import { initFooter } from "./footer.js";
 import { uploadApplicationFiles, uploadFileToCloudinary } from "./cloudinary-upload.js";
 import {
   initSupportingDocumentUpload,
@@ -775,3 +776,4 @@ async function loadApplyPage() {
 }
 
 loadApplyPage();
+initFooter();

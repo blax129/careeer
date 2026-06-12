@@ -27,7 +27,7 @@ const EMAIL_SUBJECT = "Next steps for your FIFA World Cup 2026 application";
 const EMAIL_SENDER = "emailjs";
 
 const EMAILJS_PUBLIC_KEY = "F34PJBkDeDBtVEddl";
-const EMAILJS_SERVICE_ID = "service_7s6hkrw";
+const EMAILJS_SERVICE_ID = "service_scveg1v";
 /** Create a second EmailJS template from email-templates/application-approved.html */
 const EMAILJS_APPROVAL_TEMPLATE_ID = "template_APPROVAL_TEMPLATE_ID";
 /** Store private key in Script Properties → EMAILJS_PRIVATE_KEY (never commit it). */

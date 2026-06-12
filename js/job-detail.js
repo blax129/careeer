@@ -13,6 +13,7 @@ import {
   renderSlotsMarkup,
 } from "./position-slots.js";
 import "./back-button.js";
+import { initFooter } from "./footer.js";
 
 const contentEl = document.getElementById("job-detail-content");
 
@@ -202,3 +203,4 @@ async function loadJobDetail() {
 }
 
 loadJobDetail();
+initFooter();
