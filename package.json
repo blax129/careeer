@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/verify-emailjs-build.js",
     "preview": "vite preview",
     "fetch-jobs": "curl -sL https://jobs.fifa.com/postings.json -o public/postings.json"
   },

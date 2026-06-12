@@ -4,6 +4,8 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  VITE_SITE_URL = "https://fifa26recruitment.com"
+  # EmailJS service/template IDs are hardcoded in js/site-config.js (Zoho + template_jwpyyg2).
 
 # Ensure job data is served with correct type (apply form depends on this file).
 [[headers]]

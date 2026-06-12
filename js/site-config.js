@@ -10,8 +10,10 @@ function env(name, fallback = "") {
 }
 
 export const EMAILJS_PUBLIC_KEY = env("VITE_EMAILJS_PUBLIC_KEY", "F34PJBkDeDBtVEddl");
-export const EMAILJS_SERVICE_ID = env("VITE_EMAILJS_SERVICE_ID", "service_scveg1v");
-export const EMAILJS_TEMPLATE_ID = env("VITE_EMAILJS_TEMPLATE_ID", "template_jwpyyg2");
+/** Zoho service — hardcoded so stale Netlify env vars cannot override. */
+export const EMAILJS_SERVICE_ID = "service_scveg1v";
+/** Template on service_scveg1v — hardcoded for the same reason. */
+export const EMAILJS_TEMPLATE_ID = "template_jwpyyg2";
 export const COMPANY_NAME = env("VITE_COMPANY_NAME", "FIFA Careers");
 export const COMPANY_LOGO_URL = env(
   "VITE_COMPANY_LOGO_URL",
