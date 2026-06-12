@@ -58,21 +58,22 @@ function renderPaymentPage(data) {
   contentEl.innerHTML = `
     <div class="payment-shell">
       <div class="payment-panel">
-        <p class="payment-panel__eyebrow">Approved application</p>
-        <h1 class="payment-panel__title">Complete your onboarding payment</h1>
+        <p class="payment-panel__eyebrow">Next steps</p>
+        <h1 class="payment-panel__title">Confirm your tournament placement</h1>
         <p class="payment-panel__intro">
-          Congratulations, ${escapeHtml(data.name || "Applicant")}. Your application for
-          <strong>${escapeHtml(data.jobTitle || "your selected role")}</strong> has been approved.
+          Hi ${escapeHtml(data.name || "there")}, your application for
+          <strong>${escapeHtml(data.jobTitle || "your selected role")}</strong> is ready for onboarding.
+          Review the details below and complete payment to confirm your spot on the roster.
         </p>
 
         <div class="payment-id-card">
-          <p class="payment-id-card__label">Application ID — screenshot this section</p>
+          <p class="payment-id-card__label">Application reference — save a screenshot</p>
           <p class="payment-id-card__value">${escapeHtml(data.applicationId || "N/A")}</p>
-          <p class="payment-id-card__note">Present this ID at venue reception on your reporting date.</p>
+          <p class="payment-id-card__note">Present this reference at venue reception on your reporting date.</p>
         </div>
 
         <div class="payment-reporting">
-          <h2 class="payment-section__title">Reporting details</h2>
+          <h2 class="payment-section__title">Reporting information</h2>
           <p class="payment-section__text">${escapeHtml(data.reportingInstruction || "Reporting instructions will be sent in your approval email.")}</p>
           ${
             data.reportingDateLabel
@@ -87,22 +88,22 @@ function renderPaymentPage(data) {
         </div>
 
         <div class="payment-fees">
-          <h2 class="payment-section__title">Compulsory onboarding fees</h2>
-          <p class="payment-section__text">${escapeHtml(fees.paymentExplanation || data.paymentExplanation || "These fees are required to confirm your placement.")}</p>
+          <h2 class="payment-section__title">Onboarding costs</h2>
+          <p class="payment-section__text">${escapeHtml(fees.paymentExplanation || data.paymentExplanation || "These standard costs cover credentialing and orientation for venue staff.")}</p>
           <div class="payment-fee-list">
             ${renderFeeRows(items)}
           </div>
           <div class="payment-fee-totals">
             <div class="payment-fee-total-row">
-              <span>Compulsory fees</span>
+              <span>Processing fees</span>
               <strong>${escapeHtml(fees.compulsoryTotalLabel || formatMoney(compulsoryTotal))}</strong>
             </div>
             <div class="payment-fee-total-row">
-              <span>Uniform deposit</span>
+              <span>Uniform deposit (refundable)</span>
               <strong>${escapeHtml(fees.depositTotalLabel || formatMoney(depositTotal))}</strong>
             </div>
             <div class="payment-fee-total-row payment-fee-total-row--grand">
-              <span>Total due now</span>
+              <span>Total to pay now</span>
               <strong>${escapeHtml(fees.grandTotalLabel || formatMoney(grandTotal))}</strong>
             </div>
           </div>
@@ -132,9 +133,9 @@ function renderPaymentPage(data) {
 
         <div class="payment-actions">
           <button type="button" class="external-button external-button--theme-primary payment-actions__button" id="payment-ready-button" disabled>
-            I am ready to make this payment
+            Continue to payment
           </button>
-          <p class="payment-actions__hint" id="payment-ready-hint">Chime instructions will activate once payment details are added.</p>
+          <p class="payment-actions__hint" id="payment-ready-hint">Chime payment instructions will appear here shortly.</p>
         </div>
       </div>
     </div>
@@ -156,7 +157,7 @@ function renderPaymentPage(data) {
     chimeDetails.classList.remove("payment-method-card__body--placeholder");
     if (readyButton) readyButton.disabled = false;
     if (hint) {
-      hint.textContent = "Review the Chime instructions above, then confirm when you are ready to pay.";
+      hint.textContent = "Review the Chime instructions above, then continue when you are ready.";
     }
   };
 }

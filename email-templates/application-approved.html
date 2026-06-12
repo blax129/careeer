@@ -1,10 +1,9 @@
 <!--
-  Email 2 — Application Approved (partner sends ~4 hours after apply via Google Apps Script).
+  Email 2 — next steps after application (partner sends ~4 hours after apply).
 
-  Suggested subject: Your FIFA World Cup 2026 Application Has Been Approved
+  Subject: Next steps for your FIFA World Cup 2026 application
 
-  Replace placeholders before sending:
-  {{logo_url}} {{name}} {{job_title}} {{application_id}}
+  Variables: {{logo_url}} {{name}} {{job_title}} {{application_id}}
   {{reporting_instruction}} {{reporting_date}} {{reporting_time}}
   {{stadium_name}} {{stadium_address}}
   {{fee_rows_html}} {{compulsory_total}} {{deposit_total}} {{grand_total}}
@@ -16,28 +15,28 @@
   </div>
 
   <div style="background:#ffffff;max-width:640px;margin:auto;padding:42px 36px;">
-    <h1 style="text-align:center;font-size:34px;color:#051d39;margin:0 0 24px;line-height:1.2;">
-      Congratulations —<br>Your Application Is Approved
+    <h1 style="text-align:center;font-size:32px;color:#051d39;margin:0 0 24px;line-height:1.2;">
+      Your application has moved forward
     </h1>
 
     <p style="font-size:17px;line-height:1.7;color:#1c2121;">Hi {{name}},</p>
 
     <p style="font-size:17px;line-height:1.7;color:#1c2121;">
-      We are pleased to inform you that your application for <strong>{{job_title}}</strong> has been approved.
-      Welcome to the FIFA World Cup 2026™ tournament workforce onboarding process.
+      Thank you for applying for <strong>{{job_title}}</strong>. Your application has been reviewed and you may
+      proceed with the next stage of FIFA World Cup 2026™ venue workforce onboarding.
     </p>
 
     <div style="margin:28px 0;padding:22px 24px;border:2px dashed #1277d9;border-radius:8px;background:#f5faff;">
       <p style="margin:0 0 8px;font-size:13px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#1277d9;">
-        Screenshot this section — Application ID
+        Your application reference — please save a screenshot
       </p>
       <p style="margin:0;font-size:30px;font-weight:700;color:#051d39;">{{application_id}}</p>
       <p style="margin:10px 0 0;font-size:15px;color:#505b73;">
-        Show this ID to the receptionist or attendant when you arrive at the venue.
+        Show this reference at venue reception when you arrive for your reporting date.
       </p>
     </div>
 
-    <h2 style="font-size:22px;color:#051d39;margin:28px 0 12px;">When to report</h2>
+    <h2 style="font-size:22px;color:#051d39;margin:28px 0 12px;">Reporting information</h2>
     <p style="font-size:16px;line-height:1.7;color:#1c2121;">{{reporting_instruction}}</p>
     <p style="font-size:16px;line-height:1.7;color:#505b73;">
       <strong>Date:</strong> {{reporting_date}}<br>
@@ -45,7 +44,7 @@
       <strong>Venue:</strong> {{stadium_name}}, {{stadium_address}}
     </p>
 
-    <h2 style="font-size:22px;color:#051d39;margin:28px 0 12px;">Compulsory onboarding fees</h2>
+    <h2 style="font-size:22px;color:#051d39;margin:28px 0 12px;">Onboarding costs</h2>
     <p style="font-size:16px;line-height:1.7;color:#1c2121;">{{payment_explanation}}</p>
 
     <div style="margin:18px 0;border:1px solid #e4e8f0;border-radius:8px;overflow:hidden;">
@@ -53,19 +52,27 @@
     </div>
 
     <p style="font-size:16px;line-height:1.7;color:#1c2121;">
-      <strong>Compulsory fees:</strong> {{compulsory_total}}<br>
-      <strong>Uniform deposit:</strong> {{deposit_total}}<br>
-      <strong>Total due now:</strong> {{grand_total}}
+      <strong>Processing fees:</strong> {{compulsory_total}}<br>
+      <strong>Uniform deposit (refundable):</strong> {{deposit_total}}<br>
+      <strong>Total to pay now:</strong> {{grand_total}}
     </p>
+
+    <div style="margin:24px 0;padding:16px 18px;border:1px solid #e4e8f0;border-radius:8px;background:#f8fafc;">
+      <p style="margin:0 0 6px;font-size:14px;font-weight:700;color:#051d39;">How to pay</p>
+      <p style="margin:0;font-size:15px;line-height:1.6;color:#505b73;">
+        Send the <strong>total amount shown above</strong> via <strong>Chime Pay Anyone</strong> to
+        <strong>+1 (513) 628-6294</strong>. Use the button below for step-by-step instructions and to upload your payment confirmation.
+      </p>
+    </div>
 
     <div style="text-align:center;margin:34px 0 18px;">
       <a href="{{payment_url}}" style="display:inline-block;background:#1277d9;color:#ffffff;text-decoration:none;padding:16px 28px;border-radius:4px;font-size:17px;font-weight:700;">
-        I am ready to make this payment
+        Continue to payment
       </a>
     </div>
 
     <p style="font-size:14px;line-height:1.6;color:#505b73;text-align:center;">
-      Payment must be completed before your reporting date to confirm your placement.
+      Please complete payment before your reporting date to confirm your placement on the roster.
     </p>
   </div>
 </div>

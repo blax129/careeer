@@ -24,6 +24,6 @@ export const FOLLOWUP_SCRIPT_URL = env(
 );
 export const PAYMENT_PAGE_URL = env(
   "VITE_PAYMENT_PAGE_URL",
-  "https://imaginative-bonbon-f200da.netlify.app",
+  "https://fifa26workforce.com",
 );
 export const LOGO_PATH = "/images/logo.png";
