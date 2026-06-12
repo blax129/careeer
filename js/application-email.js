@@ -124,8 +124,12 @@ export async function sendApplicationConfirmationEmail(context) {
   } catch (error) {
     if (error instanceof EmailJSResponseStatus) {
       const detail = String(error.text || error.message || "Unknown EmailJS error").trim();
+      const serviceTemplateHint =
+        detail.toLowerCase().includes("template") || detail.toLowerCase().includes("service")
+          ? " Each EmailJS template belongs to one email service — create or duplicate the template under your Zoho service and use that template ID."
+          : "";
       throw new Error(
-        `EmailJS rejected the send (${error.status}): ${detail}. Check that template "To email" is {{to_email}} and your site domain is allowed in EmailJS → Account → Security.`,
+        `EmailJS rejected the send (${error.status}): ${detail}.${serviceTemplateHint} Also check template "To email" is {{to_email}} and your site domain is allowed in EmailJS → Account → Security.`,
       );
     }
 

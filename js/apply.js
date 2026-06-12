@@ -705,7 +705,6 @@ function renderForm(posting) {
       await recordApprovedApplication(posting.id);
 
       renderSuccess(posting, {
-        confirmationEmailSent: true,
         applicationId: context.applicationId,
         emailErrorMessage: "",
       });
@@ -718,6 +717,12 @@ function renderForm(posting) {
         })
         .catch((error) => {
           console.warn("Post-submit email workflow could not complete:", error);
+          renderSuccess(posting, {
+            applicationId: context.applicationId,
+            emailErrorMessage:
+              error?.message ||
+              "We could not send your confirmation email. Please contact support.",
+          });
         });
     } catch (error) {
       const message =
