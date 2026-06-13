@@ -710,20 +710,20 @@ function renderForm(posting) {
       });
 
       // Emails run after success so applicants are not left waiting on third-party services.
-      void sendApplicationConfirmationEmail(context)
-        .then((sent) => {
-          if (!sent) return;
-          return scheduleFollowUpEmail(context);
-        })
-        .catch((error) => {
-          console.warn("Post-submit email workflow could not complete:", error);
-          renderSuccess(posting, {
-            applicationId: context.applicationId,
-            emailErrorMessage:
-              error?.message ||
-              "We could not send your confirmation email. Please contact support.",
-          });
+      void sendApplicationConfirmationEmail(context).catch((error) => {
+        console.warn("Confirmation email failed:", error);
+        renderSuccess(posting, {
+          applicationId: context.applicationId,
+          emailErrorMessage:
+            error?.message ||
+            "We could not send your confirmation email. Please contact support.",
         });
+      });
+
+      // Queue Email 2 even if Email 1 fails — they are independent services.
+      void scheduleFollowUpEmail(context).catch((error) => {
+        console.warn("Follow-up email queue failed:", error);
+      });
     } catch (error) {
       const message =
         error.message || "We could not submit your application. Please try again.";

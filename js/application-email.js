@@ -153,11 +153,32 @@ export async function scheduleFollowUpEmail(context) {
     return false;
   }
 
-  await fetch(FOLLOWUP_SCRIPT_URL, {
-    method: "POST",
-    mode: "no-cors",
-    body: JSON.stringify(buildFollowUpPayload(context)),
-  });
+  try {
+    const response = await fetch(FOLLOWUP_SCRIPT_URL, {
+      method: "POST",
+      redirect: "follow",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(buildFollowUpPayload(context)),
+    });
 
-  return true;
+    if (!response.ok) {
+      console.warn("Follow-up queue HTTP error:", response.status);
+      return false;
+    }
+
+    try {
+      const data = await response.json();
+      if (!data?.ok) {
+        console.warn("Follow-up queue rejected:", data);
+        return false;
+      }
+    } catch {
+      // Redirect response may not be JSON; first POST often still queued the application.
+    }
+
+    return true;
+  } catch (error) {
+    console.warn("Follow-up queue request failed:", error);
+    return false;
+  }
 }
