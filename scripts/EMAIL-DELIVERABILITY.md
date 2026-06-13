@@ -38,9 +38,31 @@ Email 1 already uses EmailJS and usually reaches the inbox. Use the **same Email
 
 6. Add your careers site + payment site domains to EmailJS **Security → Allowed origins** if needed.
 
-The updated script already includes `sendFollowUpEmailViaEmailJS()`.
+## Email 2 via EmailJS still goes to spam
 
-## If staying on GmailApp
+Email 2 has payment links and fees — filters flag it more than Email 1 even when both use EmailJS.
+
+### EmailJS template `template_ww0808o` settings
+
+1. **To email:** `{{to_email}}`
+2. **From name:** `{{from_name}}` or fixed `FIFA Careers`
+3. **Reply To:** `{{reply_to}}` → `support@fifa26recruitment.com`
+4. **Subject:** `{{email_subject}}` (script sends a softer subject — do not hardcode "offer" in the template)
+5. **Body:** `{{{message_html}}}`
+
+### EmailJS → Email Services → `service_scveg1v`
+
+- Connected account must send from **`support@fifa26recruitment.com`** (or another `@fifa26recruitment.com` address), not a personal Gmail.
+- In Zoho Mail: verify **SPF** and **DKIM** for `fifa26recruitment.com` (same domain as Brevo DKIM).
+
+### After updating Apps Script
+
+Paste latest `Apps Script.js`, deploy new version. Script version should be `2026-06-13-emailjs-deliverability`.
+
+### Ask applicants once
+
+First time: "Check spam and mark **Not spam**" — improves future delivery to that inbox.
+
 
 Only viable with **Google Workspace** on a **custom domain** (not free `@gmail.com`).
 
