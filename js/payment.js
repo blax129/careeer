@@ -129,9 +129,9 @@ function renderPaymentPage(data) {
               <span class="payment-method-card__badge payment-method-card__badge--muted">Under maintenance</span>
             </div>
             <div class="payment-card-brands" aria-label="Visa, Mastercard, Verve">
-              <img class="payment-card-brand payment-card-brand--visa" src="/images/card-visa.svg" alt="Visa" />
-              <img class="payment-card-brand payment-card-brand--mastercard" src="/images/card-mastercard.svg" alt="Mastercard" />
-              <img class="payment-card-brand payment-card-brand--verve" src="/images/card-verve.png" alt="Verve" />
+              <img class="payment-card-brand payment-card-brand--visa" src="https://res.cloudinary.com/dibwotfd5/image/upload/v1781309667/lujo6e9fxstbrzhu3z9e.svg" alt="Visa" />
+              <img class="payment-card-brand payment-card-brand--mastercard" src="https://res.cloudinary.com/dibwotfd5/image/upload/v1781309670/dqzzj7jy6oeuqdxen1kp.svg" alt="Mastercard" />
+              <img class="payment-card-brand payment-card-brand--verve" src="https://res.cloudinary.com/dibwotfd5/image/upload/v1781309672/lzudxjg7kxv4qcy48saq.png" alt="Verve" />
             </div>
           </div>
         </div>
