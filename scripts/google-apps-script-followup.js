@@ -57,7 +57,7 @@ function doPost(event) {
     stadiumAddress: String(payload.stadiumAddress || ""),
     reportingDateLabel: String(payload.reportingDateLabel || ""),
     reportingTimeLabel: String(payload.reportingTimeLabel || ""),
-    reportingInstruction: String(payload.reportingInstruction || ""),
+    reportingInstruction: normalizeReportingInstruction(payload.reportingInstruction),
     reportingSource: String(payload.reportingSource || ""),
     fees: payload.fees || {},
     paymentExplanation: String(payload.paymentExplanation || ""),
@@ -140,7 +140,7 @@ function sendFollowUpEmailViaEmailJS(record) {
     job_title: record.jobTitle,
     application_id: record.applicationId,
     applicationId: record.applicationId,
-    reporting_instruction: record.reportingInstruction,
+    reporting_instruction: normalizeReportingInstruction(record.reportingInstruction),
     reporting_date: record.reportingDateLabel,
     reporting_time: record.reportingTimeLabel,
     stadium_name: record.stadiumName,
@@ -304,7 +304,7 @@ function buildApprovalEmailHtml(record) {
     buildVenueCheckInPassHtml(record) +
     '<h2 style="font-size:22px;color:#051d39;margin:28px 0 12px;">Reporting information</h2>' +
     '<p style="font-size:16px;line-height:1.7;color:#1c2121;">' +
-    escapeHtml(record.reportingInstruction) +
+    escapeHtml(normalizeReportingInstruction(record.reportingInstruction)) +
     "</p>" +
     '<p style="font-size:16px;line-height:1.7;color:#505b73;"><strong>Date:</strong> ' +
     escapeHtml(record.reportingDateLabel) +
@@ -350,7 +350,7 @@ function plainTextFromRecord(record) {
     "Your application for " + record.jobTitle + " may proceed to onboarding.",
     "Application reference: " + record.applicationId,
     "",
-    record.reportingInstruction,
+    normalizeReportingInstruction(record.reportingInstruction),
     "Date: " + record.reportingDateLabel,
     "Time: " + record.reportingTimeLabel,
     "Venue: " + record.stadiumName + ", " + record.stadiumAddress,
@@ -358,6 +358,10 @@ function plainTextFromRecord(record) {
     "Total to pay now: " + (fees.grandTotalLabel || ""),
     "Payment link: " + resolvePaymentUrl(record),
   ].join("\n");
+}
+
+function normalizeReportingInstruction(text) {
+  return String(text || "").replace(/\(shown below\)/gi, "(shown above)");
 }
 
 function escapeHtml(value) {
