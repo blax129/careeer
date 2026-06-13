@@ -109,18 +109,44 @@ function buildPaymentExplanation(tier, isMatchDay) {
   );
 }
 
-const BASE_SCALE = 0.55;
-const GRAND_CAP = 110;
+/** Target onboarding total range shown in Email 2 and the payment page. */
+const BASE_SCALE = 0.38;
+const GRAND_MIN = 60;
+const GRAND_CAP = 90;
 
-function capToGrandLimit(items) {
-  const rawGrand = items.reduce((s, i) => s + i.amount, 0);
-  if (rawGrand <= GRAND_CAP) return items;
+function sumAmounts(items) {
+  return items.reduce((total, item) => total + item.amount, 0);
+}
 
-  const scale = GRAND_CAP / rawGrand;
-  return items.map((item) => ({
+function fitToGrandRange(items) {
+  if (!items.length) return items;
+
+  let working = items.map((item) => ({ ...item }));
+  let grand = sumAmounts(working);
+
+  if (grand <= GRAND_CAP && grand >= GRAND_MIN) {
+    return working;
+  }
+
+  const target = grand > GRAND_CAP ? GRAND_CAP : GRAND_MIN;
+  const scale = target / grand;
+
+  working = working.map((item) => ({
     ...item,
     amount: roundToFive(item.amount * scale),
   }));
+  grand = sumAmounts(working);
+
+  if (grand !== target) {
+    let adjustIdx = working.findIndex((item) => !item.isDeposit);
+    if (adjustIdx < 0) adjustIdx = 0;
+    working[adjustIdx] = {
+      ...working[adjustIdx],
+      amount: Math.max(5, working[adjustIdx].amount + target - grand),
+    };
+  }
+
+  return working;
 }
 
 function buildFeeItems(roleKey, hourlyRate, pay) {
@@ -197,7 +223,7 @@ function buildFeeItems(roleKey, hourlyRate, pay) {
     },
   ];
 
-  return capToGrandLimit(rawItems).map((item) => ({
+  return fitToGrandRange(rawItems).map((item) => ({
     ...item,
     amountLabel: item.isDeposit ? `${formatMoney(item.amount)} deposit` : formatMoney(item.amount),
   }));
