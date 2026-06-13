@@ -6,6 +6,8 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  # Careers site build does not use partner-amala; skip submodule checkout on deploy.
+  GIT_SUBMODULE_STRATEGY = "none"
   VITE_SITE_URL = "https://fifa26recruitment.com"
   # EmailJS service/template IDs are hardcoded in js/site-config.js (Zoho + template_jwpyyg2).
 

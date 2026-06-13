@@ -1,0 +1,3 @@
+[submodule "partner-amala"]
+	path = partner-amala
+	url = https://github.com/DOTUN-UI/Amala.git
