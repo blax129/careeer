@@ -361,7 +361,9 @@ function plainTextFromRecord(record) {
 }
 
 function normalizeReportingInstruction(text) {
-  return String(text || "").replace(/\(shown below\)/gi, "(shown above)");
+  return String(text || "")
+    .replace(/\s*\(shown below\)/gi, "")
+    .replace(/\s*\(shown above\)/gi, "");
 }
 
 function escapeHtml(value) {

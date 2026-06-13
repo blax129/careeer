@@ -81,8 +81,8 @@ export function resolveReportingSchedule({
 
   const instruction =
     source === "match_day"
-      ? `Please report to the reception desk at ${venueLabel} by ${formatTime(reportingDateTime)} on ${formatLongDate(reportingDate)}. This date aligns with the next scheduled match-day operations window at your venue. Bring a screenshot of your Application ID (shown above) to present to the attendant.`
-      : `Please report to the reception desk at ${venueLabel} by ${formatTime(reportingDateTime)} on ${formatLongDate(reportingDate)}. Bring a screenshot of your Application ID (shown above) to present to the attendant.`;
+      ? `Please report to the reception desk at ${venueLabel} by ${formatTime(reportingDateTime)} on ${formatLongDate(reportingDate)}. This date aligns with the next scheduled match-day operations window at your venue. Bring a screenshot of your Application ID to present to the attendant.`
+      : `Please report to the reception desk at ${venueLabel} by ${formatTime(reportingDateTime)} on ${formatLongDate(reportingDate)}. Bring a screenshot of your Application ID to present to the attendant.`;
 
   return {
     source,
