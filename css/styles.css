@@ -1900,6 +1900,14 @@ select {
   box-shadow: 0 1px 0 var(--border-subtle);
 }
 
+.pinpoint-page--apply #logo {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: #fff;
+  box-shadow: 0 1px 0 var(--border-subtle);
+}
+
 .pinpoint-page--job-detail .back-button__label,
 .pinpoint-page--apply .back-button__label {
   position: static;
@@ -2806,6 +2814,7 @@ select {
 @media (max-width: 991px) {
   .apply-shell {
     grid-template-columns: 1fr;
+    min-height: auto;
   }
 
   .apply-sidebar {
@@ -2819,11 +2828,78 @@ select {
 
 @media (max-width: 767px) {
   .apply-page {
-    padding-bottom: 56px;
+    padding-bottom: 24px;
+    background: var(--theme-primary-color);
+  }
+
+  .apply-shell {
+    gap: 0;
+    max-width: none;
   }
 
   .apply-shell--single {
     padding-top: 20px;
+    background: #eef1f6;
+  }
+
+  .apply-sidebar {
+    padding: 20px var(--content-padding) 24px;
+  }
+
+  .apply-sidebar__title {
+    margin-bottom: 16px;
+    font-size: clamp(2.2rem, 7vw, 2.8rem);
+    word-break: break-word;
+  }
+
+  .apply-sidebar__slots {
+    margin: -8px 0 16px;
+    font-size: 1.4rem;
+  }
+
+  .apply-sidebar__meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 16px;
+    margin-bottom: 18px;
+  }
+
+  .apply-sidebar__value {
+    font-size: 1.4rem;
+    line-height: 1.4;
+  }
+
+  .apply-sidebar__note {
+    font-size: 1.3rem;
+    padding-top: 16px;
+  }
+
+  .apply-panel {
+    padding: 24px var(--content-padding) 32px;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -8px 32px rgba(5, 29, 57, 0.12);
+  }
+
+  .apply-panel--message {
+    margin: 16px var(--content-padding) 0;
+    padding: 24px 20px;
+    border-radius: var(--card-radius);
+    box-shadow: 0 2px 12px rgba(5, 29, 57, 0.06);
+  }
+
+  .apply-form__section {
+    padding-bottom: 28px;
+    margin-bottom: 28px;
+  }
+
+  .apply-form__section-title {
+    font-size: 2.2rem;
+  }
+
+  .apply-form__section-intro,
+  .apply-form__field-note {
+    font-size: 1.45rem;
+    line-height: 1.55;
   }
 
   .apply-form__grid--two,
@@ -2831,17 +2907,115 @@ select {
     grid-template-columns: 1fr;
   }
 
+  .apply-form__input,
+  .apply-form__select,
+  .apply-form__textarea {
+    font-size: 16px;
+    min-height: 48px;
+    padding: 12px 14px;
+  }
+
+  .apply-form__textarea {
+    min-height: 120px;
+  }
+
+  .apply-form__upload-trigger {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 16px;
+  }
+
+  .apply-document-upload {
+    min-height: 148px;
+    padding: 20px 16px;
+  }
+
+  .apply-form__yes-no-option {
+    min-width: 0;
+    min-height: 48px;
+    width: 100%;
+    padding: 14px 16px;
+  }
+
+  .apply-form__choice--consent {
+    padding: 16px;
+  }
+
+  .apply-form__checkbox-label {
+    font-size: 1.45rem;
+  }
+
+  .apply-form__subsection--location {
+    padding: 16px;
+  }
+
+  .apply-form__location-question {
+    font-size: 1.5rem;
+  }
+
+  .apply-form__actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 50;
+    margin: 8px calc(-1 * var(--content-padding)) 0;
+    padding: 16px var(--content-padding);
+    padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, #fff 28%);
+    border-top: 1px solid var(--border-subtle);
+    box-shadow: 0 -8px 24px rgba(5, 29, 57, 0.06);
+  }
+
   .apply-form__submit {
     width: 100%;
+    min-height: 52px;
+    margin-top: 0;
   }
 
   .apply-form__section-head {
     flex-direction: column;
     align-items: stretch;
+    gap: 14px;
+    margin-bottom: 16px;
   }
 
   .external-button--linkedin {
     width: 100%;
+    min-height: 48px;
+  }
+
+  .apply-linkedin-modal {
+    place-items: end;
+    padding: 0;
+  }
+
+  .apply-linkedin-modal__dialog {
+    width: 100%;
+    max-width: none;
+    padding: 24px 20px max(28px, env(safe-area-inset-bottom, 28px));
+    border-radius: 16px 16px 0 0;
+  }
+
+  .apply-linkedin-modal__title {
+    font-size: 2.2rem;
+  }
+
+  .pinpoint-page--apply .site-header--minimal .site-header-top {
+    padding-bottom: 10px;
+  }
+
+  .pinpoint-page--apply .back-button {
+    flex-shrink: 0;
+  }
+
+  .pinpoint-page--apply .logo-mobile {
+    max-height: 40px;
+    width: auto;
+  }
+}
+
+@media (max-width: 380px) {
+  .apply-sidebar__meta {
+    grid-template-columns: 1fr;
   }
 }
 
