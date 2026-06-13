@@ -3,6 +3,40 @@ import { getMatchDatesForHostCity, TOURNAMENT_END } from "./match-schedule.js";
 const REPORTING_HOUR = 8;
 const REPORTING_MINUTE = 0;
 const MIN_DAYS_AFTER_APPROVAL = 2;
+/** Reporting / resumption only on Wednesday, Thursday, or Friday. */
+const REPORTING_WEEKDAYS = new Set([3, 4, 5]);
+
+function shiftForwardToReportingWeekday(date) {
+  const base = startOfDay(date);
+
+  for (let offset = 0; offset < 7; offset += 1) {
+    const candidate = addDays(base, offset);
+    if (REPORTING_WEEKDAYS.has(candidate.getDay())) {
+      return candidate;
+    }
+  }
+
+  return base;
+}
+
+function toLocalIsoDate(date) {
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${date.getFullYear()}-${month}-${day}`;
+}
+
+function normalizeMatchDatesToReportingWeekdays(isoDates) {
+  const seen = new Set();
+
+  return isoDates
+    .map((iso) => toLocalIsoDate(shiftForwardToReportingWeekday(parseIsoDate(iso))))
+    .filter((iso) => {
+      if (seen.has(iso)) return false;
+      seen.add(iso);
+      return true;
+    })
+    .sort();
+}
 
 function parseIsoDate(iso) {
   const [year, month, day] = String(iso).split("-").map(Number);
@@ -37,8 +71,9 @@ function formatTime(date) {
 }
 
 /**
- * Pick the first venue match day that is at least 2 days after approval.
- * Falls back to approval + 2 days when no schedule exists for the host city.
+ * Pick the first venue reporting window (Wed–Fri) that is at least 2 days after approval.
+ * Match dates are shifted forward to the nearest Wed, Thu, or Fri when needed.
+ * Falls back to approval + 2 days (also shifted) when no schedule exists for the host city.
  */
 export function resolveReportingSchedule({
   approvalAt = new Date(),
@@ -47,9 +82,11 @@ export function resolveReportingSchedule({
   stadiumAddress = "",
 } = {}) {
   const approvalDate = approvalAt instanceof Date ? approvalAt : new Date(approvalAt);
-  const earliest = startOfDay(addDays(approvalDate, MIN_DAYS_AFTER_APPROVAL));
+  const earliest = shiftForwardToReportingWeekday(
+    startOfDay(addDays(approvalDate, MIN_DAYS_AFTER_APPROVAL)),
+  );
   const tournamentEnd = parseIsoDate(TOURNAMENT_END);
-  const matchDates = getMatchDatesForHostCity(hostCity);
+  const matchDates = normalizeMatchDatesToReportingWeekdays(getMatchDatesForHostCity(hostCity));
 
   let reportingDate = earliest;
   let source = "default";
@@ -87,7 +124,7 @@ export function resolveReportingSchedule({
   return {
     source,
     hostCity,
-    reportingDateIso: reportingDate.toISOString().slice(0, 10),
+    reportingDateIso: toLocalIsoDate(reportingDate),
     reportingDateLabel: formatLongDate(reportingDate),
     reportingTimeLabel: formatTime(reportingDateTime),
     reportingDateTimeIso: reportingDateTime.toISOString(),
