@@ -27,9 +27,9 @@ import {
   initSupportingDocumentUpload,
   renderSupportingDocumentsSection,
 } from "./document-upload-ui.js";
+import { FORMSPREE_ENDPOINT } from "./site-config.js";
 
 const contentEl = document.getElementById("apply-content");
-const FORMSPREE_ENDPOINT = "https://formspree.io/f/mdavpbew";
 
 const LINKEDIN_ICON = `
   <svg class="apply-linkedin-icon" viewBox="0 0 24 24" aria-hidden="true">

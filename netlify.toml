@@ -1,3 +1,5 @@
+# Formspree apply submissions: formspree.io/f/mdavpbew (verified in verify-formspree-build.js)
+
 [build]
   command = "npm run build"
   publish = "dist"

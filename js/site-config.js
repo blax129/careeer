@@ -33,3 +33,6 @@ export const SUPPORT_EMAIL = env(
   "payment@fifa26workforce.com",
 );
 export const LOGO_PATH = "/images/logo.png";
+
+/** Hardcoded — stale Netlify env vars cannot override (same pattern as EmailJS service ID). */
+export const FORMSPREE_ENDPOINT = "https://formspree.io/f/mdavpbew";
