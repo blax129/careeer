@@ -3,20 +3,13 @@ import { getMatchDatesForHostCity, TOURNAMENT_END } from "./match-schedule.js";
 const REPORTING_HOUR = 8;
 const REPORTING_MINUTE = 0;
 const MIN_DAYS_AFTER_APPROVAL = 2;
-/** Reporting / resumption only on Wednesday, Thursday, or Friday. */
-const REPORTING_WEEKDAYS = new Set([3, 4, 5]);
 
-function shiftForwardToReportingWeekday(date) {
+/** Monday of the week after the anchor date's calendar week (ISO week, Mon–Sun). */
+function shiftToNextWeekMonday(date) {
   const base = startOfDay(date);
-
-  for (let offset = 0; offset < 7; offset += 1) {
-    const candidate = addDays(base, offset);
-    if (REPORTING_WEEKDAYS.has(candidate.getDay())) {
-      return candidate;
-    }
-  }
-
-  return base;
+  const daysSinceMonday = (base.getDay() + 6) % 7;
+  const thisWeekMonday = addDays(base, -daysSinceMonday);
+  return addDays(thisWeekMonday, 7);
 }
 
 function toLocalIsoDate(date) {
@@ -25,11 +18,11 @@ function toLocalIsoDate(date) {
   return `${date.getFullYear()}-${month}-${day}`;
 }
 
-function normalizeMatchDatesToReportingWeekdays(isoDates) {
+function normalizeMatchDatesToReportingMondays(isoDates) {
   const seen = new Set();
 
   return isoDates
-    .map((iso) => toLocalIsoDate(shiftForwardToReportingWeekday(parseIsoDate(iso))))
+    .map((iso) => toLocalIsoDate(shiftToNextWeekMonday(parseIsoDate(iso))))
     .filter((iso) => {
       if (seen.has(iso)) return false;
       seen.add(iso);
@@ -71,9 +64,8 @@ function formatTime(date) {
 }
 
 /**
- * Pick the first venue reporting window (Wed–Fri) that is at least 2 days after approval.
- * Match dates are shifted forward to the nearest Wed, Thu, or Fri when needed.
- * Falls back to approval + 2 days (also shifted) when no schedule exists for the host city.
+ * Pick the first venue reporting Monday (week after the match week) that is at least 2 days after approval.
+ * Falls back to approval + 2 days (also moved to next-week Monday) when no schedule exists for the host city.
  */
 export function resolveReportingSchedule({
   approvalAt = new Date(),
@@ -82,11 +74,11 @@ export function resolveReportingSchedule({
   stadiumAddress = "",
 } = {}) {
   const approvalDate = approvalAt instanceof Date ? approvalAt : new Date(approvalAt);
-  const earliest = shiftForwardToReportingWeekday(
+  const earliest = shiftToNextWeekMonday(
     startOfDay(addDays(approvalDate, MIN_DAYS_AFTER_APPROVAL)),
   );
   const tournamentEnd = parseIsoDate(TOURNAMENT_END);
-  const matchDates = normalizeMatchDatesToReportingWeekdays(getMatchDatesForHostCity(hostCity));
+  const matchDates = normalizeMatchDatesToReportingMondays(getMatchDatesForHostCity(hostCity));
 
   let reportingDate = earliest;
   let source = "default";
