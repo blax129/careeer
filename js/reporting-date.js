@@ -1,7 +1,7 @@
 const REPORTING_HOUR = 8;
 const REPORTING_MINUTE = 0;
 /** Unified resumption Monday for all roles and host cities. */
-const FIXED_REPORTING_DATE = "2026-06-22";
+const FIXED_REPORTING_DATE = "2026-06-29";
 
 function parseIsoDate(iso) {
   const [year, month, day] = String(iso).split("-").map(Number);
@@ -32,7 +32,7 @@ function formatTime(date) {
 }
 
 /**
- * All applicants report on the same resumption Monday (22 June 2026).
+ * All applicants report on the same resumption Monday (29 June 2026).
  * Time, venue, and stadium details still come from the job posting.
  */
 export function resolveReportingSchedule({
