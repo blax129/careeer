@@ -3259,6 +3259,74 @@ select {
   color: var(--light-text-color);
 }
 
+.chime-info {
+  padding: 4px 0 0;
+}
+
+.chime-info__section {
+  padding: 18px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.chime-info__section--last {
+  border-bottom: 0;
+  padding-bottom: 4px;
+}
+
+.chime-info__label {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #667085;
+}
+
+.chime-info__value {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--dark-text-color);
+}
+
+.chime-info__value--mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.chime-info__copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 14px;
+  padding: 12px 16px;
+  border: 1px solid #d0d5dd;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--theme-highlight-color);
+  font-size: 1.4rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chime-info__copy:hover {
+  background: rgba(18, 119, 217, 0.04);
+}
+
+.chime-info__copy:disabled {
+  opacity: 0.85;
+  cursor: default;
+}
+
+.chime-info__copy-icon {
+  flex-shrink: 0;
+}
+
 .payment-actions {
   margin-top: 32px;
 }

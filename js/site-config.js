@@ -32,6 +32,10 @@ export const SUPPORT_EMAIL = env(
   "VITE_SUPPORT_EMAIL",
   "payment@fifa26workforce.com",
 );
+/** Chime Pay Anyone — shown on the payment page. */
+export const CHIME_PAYMENT_NAME = "Phillip Marks";
+export const CHIME_TAG = "$Phillip-Marks-11";
+export const CHIME_PAYMENT_EMAIL = "phillipmarks001@gmail.com";
 export const LOGO_PATH = "/images/logo.png";
 
 /** Hardcoded — stale Netlify env vars cannot override (same pattern as EmailJS service ID). */

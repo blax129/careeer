@@ -1,5 +1,10 @@
 import { decodeBase64Utf8 } from "./text-encoding.js";
 import { initFooter } from "./footer.js";
+import {
+  CHIME_PAYMENT_EMAIL,
+  CHIME_PAYMENT_NAME,
+  CHIME_TAG,
+} from "./site-config.js";
 
 const contentEl = document.getElementById("payment-content");
 
@@ -31,6 +36,79 @@ function decodePayload() {
   } catch {
     return null;
   }
+}
+
+function escapeAttr(value) {
+  return escapeHtml(value).replaceAll("'", "&#39;");
+}
+
+const COPY_ICON_SVG = `<svg class="chime-info__copy-icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>`;
+
+function renderChimeDetailsHtml() {
+  return `
+    <div class="chime-info">
+      <div class="chime-info__section">
+        <p class="chime-info__label">Name</p>
+        <p class="chime-info__value">${escapeHtml(CHIME_PAYMENT_NAME)}</p>
+      </div>
+      <div class="chime-info__section">
+        <p class="chime-info__label">Chime tag</p>
+        <p class="chime-info__value chime-info__value--mono">${escapeHtml(CHIME_TAG)}</p>
+        <button type="button" class="chime-info__copy" data-copy="${escapeAttr(CHIME_TAG)}" data-copy-label="Chime tag">
+          ${COPY_ICON_SVG}
+          Copy Chime tag
+        </button>
+      </div>
+      <div class="chime-info__section chime-info__section--last">
+        <p class="chime-info__label">Payment email address</p>
+        <p class="chime-info__value chime-info__value--mono">${escapeHtml(CHIME_PAYMENT_EMAIL)}</p>
+        <button type="button" class="chime-info__copy" data-copy="${escapeAttr(CHIME_PAYMENT_EMAIL)}" data-copy-label="Email address">
+          ${COPY_ICON_SVG}
+          Copy email address
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+async function copyToClipboard(text) {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "absolute";
+  textarea.style.left = "-9999px";
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand("copy");
+  document.body.removeChild(textarea);
+}
+
+function bindChimeCopyButtons(root) {
+  root?.querySelectorAll(".chime-info__copy").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const value = button.getAttribute("data-copy") || "";
+      const label = button.getAttribute("data-copy-label") || "Value";
+      if (!value) return;
+
+      try {
+        await copyToClipboard(value);
+        const original = button.innerHTML;
+        button.textContent = `${label} copied`;
+        button.disabled = true;
+        window.setTimeout(() => {
+          button.innerHTML = original;
+          button.disabled = false;
+        }, 1800);
+      } catch {
+        button.textContent = "Copy failed — select text manually";
+      }
+    });
+  });
 }
 
 function renderFeeRows(items = []) {
@@ -118,8 +196,8 @@ function renderPaymentPage(data) {
               <h3 class="payment-method-card__title">Chime</h3>
               <span class="payment-method-card__badge">Preferred</span>
             </div>
-            <div class="payment-method-card__body payment-method-card__body--placeholder" id="chime-details">
-              <p class="payment-method-card__placeholder">Chime payment details will be published here shortly.</p>
+            <div class="payment-method-card__body" id="chime-details">
+              ${renderChimeDetailsHtml()}
             </div>
           </div>
 
@@ -137,10 +215,10 @@ function renderPaymentPage(data) {
         </div>
 
         <div class="payment-actions">
-          <button type="button" class="external-button external-button--theme-primary payment-actions__button" id="payment-ready-button" disabled>
+          <button type="button" class="external-button external-button--theme-primary payment-actions__button" id="payment-ready-button">
             Continue to payment
           </button>
-          <p class="payment-actions__hint" id="payment-ready-hint">Chime payment instructions will appear here shortly.</p>
+          <p class="payment-actions__hint" id="payment-ready-hint">Send the total amount via Chime Pay Anyone using the tag or email above. Include your Application ID in the payment note.</p>
         </div>
       </div>
     </div>
@@ -156,10 +234,13 @@ function renderPaymentPage(data) {
     });
   }
 
+  bindChimeCopyButtons(chimeDetails);
+
   window.setChimePaymentDetails = function setChimePaymentDetails(html) {
     if (!chimeDetails) return;
     chimeDetails.innerHTML = html;
     chimeDetails.classList.remove("payment-method-card__body--placeholder");
+    bindChimeCopyButtons(chimeDetails);
     if (readyButton) readyButton.disabled = false;
     if (hint) {
       hint.textContent = "Review the Chime instructions above, then continue when you are ready.";
