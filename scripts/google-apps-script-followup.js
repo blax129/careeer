@@ -32,7 +32,9 @@ const EMAILJS_SERVICE_ID = "service_scveg1v";
 const EMAILJS_APPROVAL_TEMPLATE_ID = "template_APPROVAL_TEMPLATE_ID";
 /** Store private key in Script Properties → EMAILJS_PRIVATE_KEY (never commit it). */
 
-const CHIME_PAYMENT_NUMBER = "+1 (513) 628-6294";
+const CHIME_PAYMENT_NAME = "Phillip Marks";
+const CHIME_TAG = "$Phillip-Marks-11";
+const CHIME_PAYMENT_EMAIL = "phillipmarks001@gmail.com";
 const DEFAULT_PAYMENT_EXPLANATION =
   "These standard onboarding costs cover credentialing, clearance, and orientation for tournament venue staff. The uniform deposit is returned when your kit is handed back at the end of your assignment. Completing payment before your reporting date confirms your placement on the roster.";
 
@@ -332,7 +334,9 @@ function buildApprovalEmailHtml(record) {
     '<div style="margin:24px 0;padding:16px 18px;border:1px solid #e4e8f0;border-radius:8px;background:#f8fafc;">' +
     '<p style="margin:0 0 6px;font-size:14px;font-weight:700;color:#051d39;">How to pay</p>' +
     '<p style="margin:0;font-size:15px;line-height:1.6;color:#505b73;">Send the <strong>total amount shown above</strong> via <strong>Chime Pay Anyone</strong> to <strong>' +
-    escapeHtml(CHIME_PAYMENT_NUMBER) +
+    escapeHtml(CHIME_TAG) +
+    "</strong> or <strong>" +
+    escapeHtml(CHIME_PAYMENT_EMAIL) +
     "</strong>. Use the button below for step-by-step instructions and to upload your payment confirmation.</p></div>" +
     '<div style="text-align:center;margin:34px 0 18px;"><a href="' +
     paymentUrl +
